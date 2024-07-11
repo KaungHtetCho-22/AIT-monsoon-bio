@@ -19,7 +19,7 @@ Audio files are saved on the FTP server with the following structure:
 
 - Device_id/
 - Date/
-- audio_files/ (5 sites - mocked up)
+- audio_files/ 
 
 ### GPU Server
 
@@ -27,7 +27,9 @@ The `continuous_audio_processing.py` script reads files from the FTP server, pro
 
 - Device_id/
 - Date/
-- audio_files.json/ final_results
+- audio_files.json/ 
+
+can be found at `sample_json`
 
 ## Scripts
 
