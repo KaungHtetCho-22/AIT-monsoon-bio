@@ -1,32 +1,37 @@
 import os
 import json
+from collections import defaultdict
 
-def combine_json_results(folder_path, target_date):
+def combine_json_results(output_folder):
     """
-    Combine JSON files by date and save the combined results in a single JSON file.
+    Combines all existing date.json files into a consolidated JSON structure.
 
     Parameters:
-        folder_path (str): The path to the folder containing the JSON files.
-        target_date (str): The target date in the filename to filter and combine the results.
+        output_folder (str): The folder where individual date folders are located.
     """
-    combined_results = {"date": target_date, "results": []}
-    
-    for filename in os.listdir(folder_path):
-        if filename.endswith('.json') and target_date in filename:
-            file_path = os.path.join(folder_path, filename)
-            with open(file_path, 'r') as file:
-                data = json.load(file)
-                combined_results["results"].append(data)
+    combined_results = defaultdict(list)
 
-    # Save the combined results to a new JSON file
-    output_file_path = os.path.join(folder_path, f"combined_{target_date}.json")
-    with open(output_file_path, 'w') as outfile:
-        json.dump(combined_results, outfile)
-    
-    print(f"Combined results saved to {output_file_path}")
+    # Iterate through each pi_id folder
+    for pi_id in os.listdir(output_folder):
+        pi_path = os.path.join(output_folder, pi_id)
+        if os.path.isdir(pi_path):
+            # Iterate through each date folder for the pi_id
+            for date in os.listdir(pi_path):
+                date_path = os.path.join(pi_path, date)
+                if os.path.isdir(date_path):
+                    date_json_file = os.path.join(date_path, f"{date}.json")
+                    if os.path.exists(date_json_file):
+                        with open(date_json_file, 'r') as infile:
+                            date_data = json.load(infile)
+                            combined_results[pi_id].append(date_data)
+
+    # Save combined results
+    combined_output_file = os.path.join(output_folder, f'{date}.json')
+    with open(combined_output_file, 'w') as outfile:
+        json.dump(combined_results, outfile, indent=4)
+        print(f"Combined results saved successfully: {combined_output_file}")
 
 if __name__ == '__main__':
-    folder_path = '/home/koala/Desktop/results/'  
-    target_date = "12-02-49"  
+    output_folder = '/home/koala/Desktop/results/'
     
-    combine_json_results(folder_path, target_date)
+    combine_json_results(output_folder)
