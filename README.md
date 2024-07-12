@@ -1,4 +1,4 @@
-# Audio Analysis Server
+# Audio Analysis client side
 
 This repository contains the process for analyzing audio files on a server, saving the results as JSON, and sending them back to the Monsoon web client.
 
