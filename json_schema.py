@@ -19,7 +19,7 @@ def count_hourly_occurrences(species_data):
     return dict(hourly_counts)
 
 def create_output_json(input_dir):
-    output = defaultdict(lambda: defaultdict(list))
+    output = defaultdict(list)
     
     # Traverse through the directory and find all JSON files
     for root, dirs, files in os.walk(input_dir):
@@ -33,25 +33,37 @@ def create_output_json(input_dir):
                 
                 hourly_counts = count_hourly_occurrences(species_data)
                 
-                # Combine species hourly counts under the same date for each pi_id
-                for species, counts in hourly_counts.items():
-                    if not output[pi_id][date]:
-                        output[pi_id][date] = {species: counts}
-                    else:
-                        if species in output[pi_id][date]:
-                            output[pi_id][date][species] = [
-                                output[pi_id][date][species][i] + counts[i] for i in range(24)
+                # Prepare the entry with mock coordinates and scores
+                entry = {
+                    "date": date,
+                    "coordinate": [18.8018, 98.9948],  # Mock coordinates
+                    "score": 5,  # Mock score
+                    "species": hourly_counts
+                }
+                
+                # Check if the entry for the date already exists
+                existing_entry = next((item for item in output[pi_id] if item["date"] == date), None)
+                if existing_entry:
+                    for species, counts in hourly_counts.items():
+                        if species in existing_entry["species"]:
+                            existing_entry["species"][species] = [
+                                existing_entry["species"][species][i] + counts[i] for i in range(24)
                             ]
                         else:
-                            output[pi_id][date][species] = counts
+                            existing_entry["species"][species] = counts
+                else:
+                    output[pi_id].append(entry)
     
     # Convert defaultdict to regular dict before returning
-    return {pi_id: dict(dates) for pi_id, dates in output.items()}
+    return dict(output)
 
+# Directory containing JSON files
 input_dir = 'sample_json'
 
+# Generate the output JSON
 output_json = create_output_json(input_dir)
 
+# Write the output to a file
 with open('output.json', 'w') as outfile:
     json.dump(output_json, outfile, indent=2)
 
