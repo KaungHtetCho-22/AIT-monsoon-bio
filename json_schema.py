@@ -1,5 +1,4 @@
 import json
-from datetime import datetime
 from collections import defaultdict
 import os
 
@@ -12,10 +11,10 @@ def count_hourly_occurrences(species_data):
     hourly_counts = defaultdict(lambda: [0] * 24)
     for entry in species_data:
         for time_stamp, data in entry.items():
-            hour_str = os.path.basename(time_stamp).split('_')[0]
+            # Extract the hour from the time_stamp
+            hour_str = time_stamp.split('_')[0]
             hour = int(hour_str.split('-')[0])
             species = data['Class']
-            score = data['Score']
             hourly_counts[species][hour] += 1
     return dict(hourly_counts)
 
@@ -34,23 +33,25 @@ def create_output_json(input_dir):
                 
                 hourly_counts = count_hourly_occurrences(species_data)
                 
-                # Append species hourly counts under the same date for each pi_id
-                output[pi_id][date].append({
-                    "coordinate": [18.8018, 98.9948],  # Mock coordinates
-                    "score": 5,  # Mock score
-                    "species": hourly_counts
-                })
+                # Combine species hourly counts under the same date for each pi_id
+                for species, counts in hourly_counts.items():
+                    if not output[pi_id][date]:
+                        output[pi_id][date] = {species: counts}
+                    else:
+                        if species in output[pi_id][date]:
+                            output[pi_id][date][species] = [
+                                output[pi_id][date][species][i] + counts[i] for i in range(24)
+                            ]
+                        else:
+                            output[pi_id][date][species] = counts
     
     # Convert defaultdict to regular dict before returning
     return {pi_id: dict(dates) for pi_id, dates in output.items()}
 
-# Directory containing JSON files
 input_dir = 'sample_json'
 
-# Generate the output JSON
 output_json = create_output_json(input_dir)
 
-# Write the output to a file
 with open('output.json', 'w') as outfile:
     json.dump(output_json, outfile, indent=2)
 
