@@ -8,14 +8,14 @@ def process_json_file(file_path):
     return data
 
 def count_hourly_occurrences(species_data):
-    hourly_counts = defaultdict(lambda: [0] * 24)
+    hourly_counts = defaultdict(lambda: ['0'] * 24)
     for entry in species_data:
         for time_stamp, data in entry.items():
             # Extract the hour from the time_stamp
             hour_str = time_stamp.split('_')[0]
             hour = int(hour_str.split('-')[0])
             species = data['Class']
-            hourly_counts[species][hour] += 1
+            hourly_counts[species][hour] = str(int(hourly_counts[species][hour]) + 1)
     return dict(hourly_counts)
 
 def create_output_json(input_dir):
@@ -47,7 +47,7 @@ def create_output_json(input_dir):
                     for species, counts in hourly_counts.items():
                         if species in existing_entry["species"]:
                             existing_entry["species"][species] = [
-                                existing_entry["species"][species][i] + counts[i] for i in range(24)
+                                str(int(existing_entry["species"][species][i]) + int(counts[i])) for i in range(24)
                             ]
                         else:
                             existing_entry["species"][species] = counts
