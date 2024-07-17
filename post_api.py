@@ -1,14 +1,14 @@
 import requests
 import json
 
-access_token = 'XXXX' # add access_token
+access_token = 'XXX' 
 
 sensor_data = 'output.json'
 
 with open(sensor_data, 'r') as file:
     sensor_data = json.load(file)
 
-url = 'https://apple.com/apple/API/SendIoTDevice' # change URL
+url = 'https://apple.com' # change URL
 
 headers = {
     'Content-Type': 'application/json',
