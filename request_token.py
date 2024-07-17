@@ -1,12 +1,12 @@
 import requests
 
-url = "https://apple.com/apple/API/SendIoTDevice"
+url = "https://apple.com"
 data = {
     "grant_type": "password",
     "client_id": "id",
     "client_secret": "secret",
     "username": "username",
-    "password": "passwd",
+    "password": "password",
     "scope": "scope"
 }
 
